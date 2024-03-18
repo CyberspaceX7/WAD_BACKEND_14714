@@ -1,4 +1,6 @@
 using _00014714.Data;
+using _00014714.Models;
+using _00014714.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,9 +12,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configuring SurveyFormDbContext to use SQL Server with the connection string from appsettings.
 builder.Services.AddDbContext<SurveyFormDbContext>(
     options => options.UseSqlServer(
         builder.Configuration.GetConnectionString("SqlServerConnection")));
+
+// Registering SurveyRepository and CategoryRepository as scoped services for dependency injection.
+builder.Services.AddScoped<IRepository<Survey>, SurveyRepository>();
+builder.Services.AddScoped<IRepository<Category>, CategoryRepository>();
 
 var app = builder.Build();
 
