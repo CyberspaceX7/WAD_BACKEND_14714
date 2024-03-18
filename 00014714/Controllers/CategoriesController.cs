@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using _00014714.Data;
+﻿using Microsoft.AspNetCore.Mvc;
 using _00014714.Models;
+using _00014714.Repositories;
 
 namespace _00014714.Controllers
 {
@@ -14,40 +8,28 @@ namespace _00014714.Controllers
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        private readonly SurveyFormDbContext _context;
-
-        public CategoriesController(SurveyFormDbContext context)
+        private readonly IRepository<Category> _categoryRepository;
+        public CategoriesController(IRepository<Category> categoryRepository)
         {
-            _context = context;
+            _categoryRepository = categoryRepository;
         }
 
         // GET: api/Categories
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
-        {
-          if (_context.Categories == null)
-          {
-              return NotFound();
-          }
-            return await _context.Categories.ToListAsync();
-        }
+        public async Task<IEnumerable<Category>> GetCategories() => await _categoryRepository.GetAllAsync();
 
         // GET: api/Categories/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Category>> GetCategory(int id)
         {
-          if (_context.Categories == null)
-          {
-              return NotFound();
-          }
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _categoryRepository.GetByIDAsync(id);
 
             if (category == null)
             {
                 return NotFound();
             }
 
-            return category;
+            return Ok(category);
         }
 
         // PUT: api/Categories/5
@@ -59,25 +41,7 @@ namespace _00014714.Controllers
             {
                 return BadRequest();
             }
-
-            _context.Entry(category).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CategoryExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
+            await _categoryRepository.UpdateAsync(category);
             return NoContent();
         }
 
@@ -86,13 +50,7 @@ namespace _00014714.Controllers
         [HttpPost]
         public async Task<ActionResult<Category>> PostCategory(Category category)
         {
-          if (_context.Categories == null)
-          {
-              return Problem("Entity set 'SurveyFormDbContext.Categories'  is null.");
-          }
-            _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
-
+            await _categoryRepository.AddAsync(category);
             return CreatedAtAction("GetCategory", new { id = category.Id }, category);
         }
 
@@ -100,25 +58,8 @@ namespace _00014714.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
-            if (_context.Categories == null)
-            {
-                return NotFound();
-            }
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
-
+            await _categoryRepository.DeleteAsync(id);
             return NoContent();
-        }
-
-        private bool CategoryExists(int id)
-        {
-            return (_context.Categories?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
