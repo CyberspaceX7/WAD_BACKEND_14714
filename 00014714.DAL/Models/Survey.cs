@@ -16,9 +16,9 @@ namespace _00014714.Models
 
         [Required(ErrorMessage = "Question one is required")]
         public string? Question1 { get; set; }
-
-        [Required(ErrorMessage = "Question two is required")]
         public string? Question2 { get; set; }
+
+        [Required(ErrorMessage = "Category of the survey is required")]
         public int? CategoryId { get; set; }
 
         [ForeignKey("CategoryId")]

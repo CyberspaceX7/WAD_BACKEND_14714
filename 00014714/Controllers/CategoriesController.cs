@@ -4,7 +4,7 @@ using _00014714.Repositories;
 
 namespace _00014714.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class CategoriesController : ControllerBase
     {

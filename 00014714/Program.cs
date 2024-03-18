@@ -21,6 +21,17 @@ builder.Services.AddDbContext<SurveyFormDbContext>(
 builder.Services.AddScoped<IRepository<Survey>, SurveyRepository>();
 builder.Services.AddScoped<IRepository<Category>, CategoryRepository>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+      policy =>
+      {
+          policy.AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader();
+      });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -29,6 +40,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors();
 
 app.UseHttpsRedirection();
 
